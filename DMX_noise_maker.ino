@@ -12,7 +12,7 @@ void setup() {
 void loop()
 {
   delay(1000);
-  DMX::start_code = 0x01;     // noise start code
+  DMX::start_code = random(1, 256); // noise random start code
   DMX::Write(7, 255);         // green
   delay(1000);
   DMX::Write(7, 0);           // green
