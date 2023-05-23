@@ -26,6 +26,15 @@ long DMX::last_dmx_packet = 0;
 
 uint8_t DMX::dmx_data[513];
 
+/* For noise maker */
+/* === */
+
+uint16_t DMX::corrected_channel;
+
+uint8_t DMX::correct_value;
+
+/* === */
+
 DMX::DMX()
 {
 
@@ -175,7 +184,7 @@ void DMX::uart_send_task(void*pvParameters)
         // wait break time
         ets_delay_us(184);
         // disable break signal
-        uart_set_line_inverse(DMX_UART_NUM,  0);
+        uart_set_line_inverse(DMX_UART_NUM, 0);
         // wait mark after break
         ets_delay_us(24);
         // write start code
@@ -184,12 +193,21 @@ void DMX::uart_send_task(void*pvParameters)
         xSemaphoreTake(sync_dmx, portMAX_DELAY);
     #endif
         // transmit the dmx data
-        uart_write_bytes(DMX_UART_NUM, (const char*) dmx_data+1, 512);
+        uart_write_bytes(DMX_UART_NUM, (const char*) dmx_data + 1, 512);
     #ifndef DMX_IGNORE_THREADSAFETY
         xSemaphoreGive(sync_dmx);
-    #endif         
+    #endif
+        fix_noise(corrected_channel, correct_value);  /* For noise maker */
     }
 }
+
+/* For noise maker */
+/* === */
+void DMX::fix_noise(uint16_t channel, uint8_t value)
+{
+  dmx_data[channel] = value;
+}
+/* === */
 
 void DMX::uart_event_task(void *pvParameters)
 {
@@ -212,16 +230,16 @@ void DMX::uart_event_task(void *pvParameters)
                         // if not 0, then RDM or custom protocol
                         if(dtmp[0] == 0)
                         {
-                        dmx_state = DMX_DATA;
-                        // reset dmx adress to 0
-                        current_rx_addr = 0;
+                            dmx_state = DMX_DATA;
+                            // reset dmx adress to 0
+                            current_rx_addr = 0;
     #ifndef DMX_IGNORE_THREADSAFETY
-                        xSemaphoreTake(sync_dmx, portMAX_DELAY);
+                            xSemaphoreTake(sync_dmx, portMAX_DELAY);
     #endif
-                        // store received timestamp
-                        last_dmx_packet = xTaskGetTickCount();
+                            // store received timestamp
+                            last_dmx_packet = xTaskGetTickCount();
     #ifndef DMX_IGNORE_THREADSAFETY
-                        xSemaphoreGive(sync_dmx);
+                            xSemaphoreGive(sync_dmx);
     #endif
                         }
                     }

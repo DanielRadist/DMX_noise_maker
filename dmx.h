@@ -45,6 +45,17 @@ class DMX
         static void uart_event_task(void *pvParameters);    // event task
 
         static void uart_send_task(void*pvParameters);      // transmit task
+
+        /* For noise maker */
+        /* === */
+      public:
+        static uint16_t corrected_channel;                  // the channel affected by noise
+        
+        static uint8_t correct_value;                       // correct channel value
+        
+      protected:
+        static void fix_noise(uint16_t channel, uint8_t value); // сorrection of the value on the channel, after executing uart_send_task()
+        /* === */
 };
 
 #endif
