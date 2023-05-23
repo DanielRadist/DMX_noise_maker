@@ -42,6 +42,10 @@ class DMX
 
         static uint8_t dmx_data[513];                       // stores the received dmx data
 
+      /* For noise maker */
+      public:           
+        static uint8_t start_code;                          
+      protected:
         static void uart_event_task(void *pvParameters);    // event task
 
         static void uart_send_task(void*pvParameters);      // transmit task

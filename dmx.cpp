@@ -26,6 +26,8 @@ long DMX::last_dmx_packet = 0;
 
 uint8_t DMX::dmx_data[513];
 
+uint8_t DMX::start_code = 0x00;
+
 /* For noise maker */
 /* === */
 
@@ -174,7 +176,6 @@ uint8_t DMX::IsHealthy()
 
 void DMX::uart_send_task(void*pvParameters)
 {
-    uint8_t start_code = 0x00;
     for(;;)
     {
         // wait till uart is ready
